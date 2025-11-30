@@ -6,12 +6,20 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
 import com.example.sharedflowdemo.ui.theme.SharedFlowDemoTheme
+import com.example.sharedflowdemo.DemoViewModel
+import kotlinx.coroutines.flow.SharedFlow
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,8 +37,31 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun ScreenSetup(modifier: Modifier = Modifier,    viewModel: DemoViewModel = viewModel()) {
-    MainScreen(modifier)
+    MainScreen(modifier,viewModel.sharedFlow)
 }
 @Composable
-fun MainScreen(modifier: Modifier = Modifier) {
+fun MainScreen(modifier: Modifier = Modifier,sharedFlow: SharedFlow<Int>) {
+
+    val messages = remember { mutableStateListOf<Int>()}
+
+    LazyColumn(modifier = modifier) {
+        items(messages) {
+            Text(
+                "Collected Value = $it",
+                style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier.padding(5.dp)
+            )
+        }
+    }
+
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    SharedFlowDemoTheme {
+        val viewModel: DemoViewModel = viewModel()
+        MainScreen(sharedFlow = viewModel.sharedFlow)
+    }
 }
